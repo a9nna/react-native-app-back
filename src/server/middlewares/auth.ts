@@ -1,5 +1,7 @@
-import { Request, Response } from "express";
+import "dotenv/config";
+import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { User } from "../../database/models/index.js";
 
 const auth = () => {
@@ -30,7 +32,19 @@ const auth = () => {
     }
   };
 
-  return { register };
+  const login = (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { username } = req.body;
+
+      const token = jwt.sign({ id: username }, "jwt_secret");
+
+      res.json({ token: token });
+    } catch (error: Error | any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  return { register, login };
 };
 
 export default auth;
